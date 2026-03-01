@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>familyGramm</title>
+    <style>
+        body { font-family: Arial; background: #fafafa; margin: 0; padding-bottom: 80px; }
+        .header { background: #fff; padding: 20px; text-align: center; border-bottom: 1px solid #dbdbdb; }
+        .posts { max-width: 600px; margin: 20px auto; padding: 0 20px; }
+        .post { background: white; margin: 20px 0; padding: 20px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .nav { position: fixed; bottom: 0; width: 100%; background: white; padding: 10px; border-top: 1px solid #dbdbdb; display: flex; justify-content: space-around; }
+        .add-post { position: fixed; bottom: 100px; right: 20px; width: 60px; height: 60px; background: #0095f6; color: white; border: none; border-radius: 50%; font-size: 24px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h2>👨‍👩‍👧‍👦 familyGramm</h2>
+    </div>
+    
+    <div class="posts" id="posts">Загрузка...</div>
+    
+    <button class="add-post" onclick="showAddPost()">➕</button>
+    
+    <div class="nav">
+        <button onclick="loadPosts()">🏠</button>
+        <button onclick="alert('Stories')">📸</button>
+        <button onclick="alert('Profile')">👤</button>
+    </div>
+
+    <script>
+        async function loadPosts() {
+            const res = await fetch('/api/posts');
+            const posts = await res.json();
+            document.getElementById('posts').innerHTML = posts.map(p => 
+                `<div class="post">
+                    <strong>${p.author}</strong><br>
+                    ${p.text}<br><br>
+                    ❤️ ${p.likes} лайков
+                </div>`
+            ).join('') || '<div class="post">Нет постов. Добавьте первый!</div>';
+        }
+        
+        function showAddPost() {
+            const text = prompt('Напишите пост:');
+            const author = prompt('Ваше имя:');
+            if (text && author) {
+                fetch('/api/posts', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({text, author})
+                }).then(() => loadPosts());
+            }
+        }
+        
+        loadPosts();
+    </script>
+</body>
+</html>
